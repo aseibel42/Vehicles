@@ -1,0 +1,278 @@
+<html>
+  <head>
+    <!-- materialize -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    
+    <script src = "js/p5.min.js"> </script>
+    <script src = "js/vehicle_v4.js"></script>
+    <script src = "js/environment_v2.js"></script>
+    <script src = "js/brain_v3.js"></script>
+    <script src = "js/population_v2.js"></script>
+    <script src = "js/genePool_v2.js"></script>
+    <script src = "js/genome_v2.js"></script>
+    <script src = "js/simulation.js"></script>
+    <script src = "js/ui.js"></script>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"/>
+
+    <style>
+        body {
+          background-color: rgb(245, 245, 245);
+          padding: 0;
+          margin: 0;
+        }
+
+        #simulation-canvas {
+          height: 100%;
+          display: grid;
+        }
+
+        #simulation-canvas .p5Canvas {
+          margin: auto;
+        }
+
+        #control-panel {
+          padding: 15px 1.8%;
+          height: 100%;
+          z-index: -100;
+          overflow-y: scroll;
+        }
+  
+        .font-1 * {
+          color: rgba(255, 255, 255, 0.9) !important;
+        }
+  
+        .select-dropdown * {
+          color: rgba(50, 50, 50, 0.8) !important;
+        }
+
+        /* Customizing colors for components */
+        input[type=range] {
+          background-color: #ffea00;
+          border: 0 !important;
+        } 
+
+        input[type=range]::-webkit-slider-thumb {
+          background-color: #ffea00;
+          border: 0 !important;
+        }
+        input[type=range]::-moz-range-thumb {
+          background-color: #ffea00;
+          border: 0 !important;
+        }
+        input[type=range]::-ms-thumb {
+          background-color: #ffea00;
+          border: 0 !important;
+        }
+
+        /***** These are to edit the thumb and the text inside the thumb *****/
+        input[type=range] + .thumb {
+          background-color: #ffea00;
+        }
+        input[type=range] + .thumb.active .value {
+          color: rgba(0,0,0,0.87) !important;
+        }
+
+        .switch label input[type=checkbox]:checked+.lever {
+          background-color: #80deea;
+        }
+
+        .switch label input[type=checkbox]:checked+.lever:after  {
+          background-color: #ffea00;
+        }
+
+      </style>
+  </head>
+
+  <body>
+    <div>
+        <div class="row">
+
+            <div id="simulation-canvas" class="col s12 m9">
+            </div>
+
+            <div id="control-panel" class="col s12 m3 cyan darken-2">
+              
+              <div style="margin-bottom: 30px;">
+                <a id="resetBtn" class="waves-effect waves-light btn-small cyan lighten-1" href="javascript:void(0);"
+                  style="margin-bottom: 5px;">
+                  <i class="material-icons left">refresh</i>
+                  Reset
+                </a>
+                <a id="playBtn" class="waves-effect waves-light btn-small cyan lighten-1" href="javascript:void(0);"
+                  style="margin-bottom: 5px;" 
+                  onclick="pauseSimulation(this);return false">
+                  <i class="material-icons left">pause</i>
+                  Pause
+                </a>
+              </div>
+  
+              <form action="#" class="font-1">
+  
+              <div class="input-field">
+                <select id="module">
+                  <!-- <option value="" disabled selected>Choose your option</option> -->
+                  <option value="TRAFFIC_MODULE" selected="selected">Traffic</option>
+                  <option value="FOOD_FINDER_MODULE">Food Finders</option>
+                  <option value="PREDATOR_PREY_MODULE">Predator-Prey</option>
+                  <!-- <option value="EXPLORATION_MODULE">Exploration</option> -->
+                  <option value="CLUSTER_MODULE">Clustering</option>
+                </select>
+                <label>Module</label>
+              </div>
+
+              <label>Randomize Neural Circuits?</label>
+              <div class="switch" style="margin-bottom: 20px;">
+                  <label>
+                    Off
+                    <input type="checkbox" id="randomizeNC">
+                    <span class="lever"></span>
+                    On
+                  </label>
+              </div> 
+
+              <div>
+                <label>Population size</label>
+                <p class="range-field">
+                  <input type="range" id="populationSize" min="5" max="30" step="1" />
+                </p>
+              </div>
+  
+              <div>
+                  <label>Number of champions copied</label>
+                  <p class="range-field">
+                    <input type="range" id="numberCopied" min="2" max="5" step="1" />
+                  </p>
+              </div>
+  
+              <div class="input-field">
+                  <select id="genLifespan">
+                    <!-- <option value="" disabled selected>Choose your option</option> -->
+                    <option value=5>5 seconds</option>
+                    <option value=10 >10 seconds</option>
+                    <option value=15>15 seconds</option>
+                    <option value=20>20 seconds</option>
+                    <option value=30>30 seconds</option>
+                    <option value=Inf selected="selected">Infinite</option>
+                  </select>
+                  <label>Lifespan</label>
+              </div>
+  
+              <div class="input-field">
+                  <select id="mutationRate">
+                    <!-- <option value="" disabled selected>Choose your option</option> -->
+                    <option value="DISABLED">disabled</option>
+                    <option value="SLOW" selected="selected">slow</option>
+                    <option value="MEDIUM">medium</option>
+                    <option value="FAST">fast</option>
+                  </select>
+                  <label>Mutation rate</label>
+                </div>
+  
+              
+              <label>Show neural circuits?</label>
+              <div class="switch" style="margin-bottom: 20px;">
+                  <label>
+                    Off
+                    <input type="checkbox" id="showNC">
+                    <span class="lever"></span>
+                    On
+                  </label>
+              </div>
+  
+              <label>Show signal area?</label>
+              <div class="switch" style="margin-bottom: 20px;">
+                  <label>
+                    Off
+                    <input type="checkbox" id="showFields">
+                    <span class="lever"></span>
+                    On
+                  </label>
+              </div>  
+              
+              <div>
+                  <label>Simulation speed</label>
+                  <p class="range-field">
+                    <input type="range" id="simSpeed" min="0" max="4" step="0.1" />
+                  </p>
+              </div>
+  
+              <div>
+                  <label>Environment noise</label>
+                  <p class="range-field">
+                    <input type="range" id="envNoise" min="0" max="1" step="0.01" />
+                  </p>
+              </div>
+  
+              <div>
+                  <label>Signal radius</label>
+                  <p class="range-field">
+                    <input type="range" id="signalRadius" min="0" max="3" step="0.01" />
+                  </p>
+              </div>
+                          
+              <div>
+                  <label>Signal Intensity</label>
+                  <p class="range-field">
+                    <input type="range" id="signalIntensity" min="0" max="4" step="0.01" />
+                  </p>
+              </div>
+  
+              <div>
+                  <label>Mass Scale</label>
+                  <p class="range-field">
+                    <input type="range" id="mass" min="0.01" max="4" step="0.01" />
+                  </p>
+              </div>
+                          
+              <div>
+                  <label>Motor speed</label>
+                  <p class="range-field">
+                    <input type="range" id="motorSpeed" min="0" max="400" step="1" />
+                  </p>
+              </div>
+  
+              <div>
+                  <label>Motor Friction</label>
+                  <p class="range-field">
+                    <input type="range" id="friction" min="0.01" max="1" step="0.01" />
+                  </p>
+              </div>
+                          
+              <div>
+                  <label>Motor front-back placement</label>
+                  <p class="range-field">
+                    <input type="range" id="motorFBPlacement" min="-1" max="1" step="0.05" />
+                  </p>
+              </div>
+  
+              <div>
+                  <label>Motor separation</label>
+                  <p class="range-field">
+                    <input type="range" id="motorSeparation" min="0" max="2" step="0.05" />
+                  </p>
+              </div>
+                          
+              <div>
+                  <label>Sensor front-back placement</label>
+                  <p class="range-field">
+                    <input type="range" id="sensorFBPlacement" min="-1" max="1" step="0.05" />
+                  </p>
+              </div>
+  
+              <div>
+                  <label>Sensor separation</label>
+                  <p class="range-field">
+                    <input type="range" id="sensorSeparation" min="0" max="1" step="0.05" />
+                  </p>
+              </div>
+  
+              </form>
+            </div>
+        </div>
+      </div>
+  
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  </body>
+</html>
